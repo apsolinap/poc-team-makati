@@ -39,7 +39,12 @@ async function populateUserTable(){
 }
 
 async function addUser(){
-
+    var pubnub = new PubNub({
+          publishKey : 'pub-c-8266b3af-df4a-4508-91de-0a06b9634a69',
+          subscribeKey : 'sub-c-b20376b2-5215-11ea-80a4-42690e175160',
+          uuid: "admin"
+    });
+    
     let user_name = $("input[name='username']").val();
     let user_password = $("input[name='password']").val();
     let user_department = $("input[name='department']").val();
@@ -67,6 +72,13 @@ async function addUser(){
         .then(async function(){
             if(!alert('Successfully added!')){
                 $('#addNewUserModal').modal('hide');
+                pubnub.createUser({   
+                    id: size,
+                    name: user_name
+                },
+                function(status, response) {
+                }
+            );
             }
         })
         .catch(function (error) {
@@ -84,6 +96,7 @@ async function deleteUser(user_id){
                     doc.ref.delete();
                 });
                 alert('User Deletion Successful!');
+                pubnub.deleteUser(user_id, function(status, response) {});
             })
             .catch(function (error) {
                 console.error("Error category deletion: ", error);
